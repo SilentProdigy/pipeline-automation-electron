@@ -3,6 +3,7 @@ const express = require('express');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const axios = require('axios');
 
 
 // Create an Express application
@@ -77,8 +78,24 @@ app.post('/login', (req, res) => {
   });
 });
 
+app.get('/download', async (req, res) => {
+  try {
+    const response = await axios({
+      method: 'GET',
+      url: 'http://localhost:3005/download', // URL of the file on Linux server
+      responseType: 'stream',
+    });
+
+    res.setHeader('Content-Disposition', 'attachment; filename=file.ext'); // Set the filename
+    response.data.pipe(res);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error occurred while downloading the file');
+  }
+});
 
 // Start the Express server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
