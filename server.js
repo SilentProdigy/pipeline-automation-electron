@@ -1,12 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
+const path = require('path');
 
 const app = express();
 const port = 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'pipeline-automation-electron')));
 
 // Replace with your actual MySQL database configuration
 const db = mysql.createConnection({
@@ -28,7 +30,7 @@ app.use(express.static('registration-app/build'));
 
 // Serve the React app
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pipeline-automation-electron/build', 'public/index.html'));
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 // Register endpoint
