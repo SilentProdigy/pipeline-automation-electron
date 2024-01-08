@@ -10,7 +10,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 
-const LoginForm = () => {
+const LoginForm = ({ onLogin }) => {
   const history = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -52,6 +52,7 @@ const LoginForm = () => {
       const responseData = await response.json();
       console.log(responseData.message); // Successful login message
       history('/home');
+      onLogin();
     } catch (error) {
       console.error('Login error:', error.message);
     }
