@@ -1,16 +1,15 @@
+// Import required modules
 const express = require('express');
-const bodyParser = require('body-parser');
 const mysql = require('mysql');
-const path = require('path');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 
+
+// Create an Express application
 const app = express();
-const port = 3000;
+const port = 3001;
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'pipeline-automation-electron')));
-
-// Replace with your actual MySQL database configuration
+// Configure MySQL database connection
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -18,37 +17,38 @@ const db = mysql.createConnection({
   database: 'pipeline_automation'
 });
 
-db.connect((err) => {
+// Connect to MySQL database
+db.connect(err => {
   if (err) {
-    console.error('Error connecting to MySQL:', err);
-    return;
+    console.error('Error connecting to MySQL database:', err);
+  } else {
+    console.log('Connected to MySQL database');
   }
-  console.log('Connected to MySQL database');
 });
 
-app.use(express.static('registration-app/build'));
+app.use(cors());
 
-// Serve the React app
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
+// Use body-parser middleware to parse incoming JSON requests
+app.use(bodyParser.json());
 
-// Register endpoint
+// Define the registration endpoint
 app.post('/register', (req, res) => {
   const { username, password } = req.body;
 
-  // Insert user into the database
+  // Insert user data into the database
   const query = 'INSERT INTO users (username, password) VALUES (?, ?)';
-  db.query(query, [username, password], (err, results) => {
+  db.query(query, [username, password], (err, result) => {
     if (err) {
-      console.error('Error registering user:', err);
+      console.error('Error inserting user data into the database:', err);
       res.status(500).json({ error: 'Internal Server Error' });
-      return;
+    } else {
+      console.log('User registered successfully');
+      res.status(201).json({ message: 'User registered successfully' });
     }
-    res.status(200).json({ message: 'Registration successful' });
   });
 });
 
+// Start the Express server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

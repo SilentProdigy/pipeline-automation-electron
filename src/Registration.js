@@ -8,6 +8,7 @@ import {
   Button,
   VStack,
 } from '@chakra-ui/react';
+import axios from 'axios';
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -23,12 +24,19 @@ const RegistrationForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Implement the registration logic here, e.g., send a request to the server
+    try {
+      // Make an HTTP request to the registration endpoint
+      const response = await axios.post('http://localhost:3001/register', formData);
 
-    console.log('Form submitted:', formData);
+      // Handle the response (you can update the UI or redirect the user)
+      console.log('Registration successful:', response.data);
+    } catch (error) {
+      // Handle errors (display an error message, etc.)
+      console.error('Registration failed:', error.message);
+    }
   };
 
   return (
