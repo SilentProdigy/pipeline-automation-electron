@@ -1,5 +1,6 @@
-// src/RegistrationForm.js
+// src/LoginForm.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
 import {
   Box,
   FormControl,
@@ -8,11 +9,10 @@ import {
   Button,
   VStack,
 } from '@chakra-ui/react';
-import axios from 'axios';
-import { useNavigate } from 'react-router';
 
-const RegistrationForm = () => {
+const LoginForm = () => {
   const history = useNavigate();
+
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -29,16 +29,31 @@ const RegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      // Make an HTTP request to the registration endpoint
-      const response = await axios.post('http://localhost:3001/register', formData);
+    const url = 'http://localhost:3001/login'; // Replace with your actual server URL
+    
 
-      // Handle the response (you can update the UI or redirect the user)
-      console.log('Registration successful:', response.data);
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            username: formData.username,
+            password: formData.password,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Login failed');
+      }
+
+      const responseData = await response.json();
+      console.log(responseData.message); // Successful login message
       history('/home');
     } catch (error) {
-      // Handle errors (display an error message, etc.)
-      console.error('Registration failed:', error.message);
+      console.error('Login error:', error.message);
     }
   };
 
@@ -69,7 +84,7 @@ const RegistrationForm = () => {
             />
           </FormControl>
           <Button mt={4} colorScheme="teal" type="submit">
-            Register
+            Login
           </Button>
         </form>
       </Box>
@@ -77,4 +92,4 @@ const RegistrationForm = () => {
   );
 };
 
-export default RegistrationForm;
+export default LoginForm;

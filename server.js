@@ -48,6 +48,36 @@ app.post('/register', (req, res) => {
   });
 });
 
+// Define the login endpoint
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  // Check if the username and password are provided
+  if (!username || !password) {
+    res.status(400).json({ error: 'Username and password are required' });
+    return;
+  }
+
+  // Query the database to find the user with the provided credentials
+  const query = 'SELECT * FROM users WHERE username = ? AND password = ?';
+  db.query(query, [username, password], (err, results) => {
+    if (err) {
+      console.error('Error querying the database for login:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+      return;
+    }
+
+    // Check if the user with the provided credentials exists
+    if (results.length === 0) {
+      res.status(401).json({ error: 'Invalid username or password' });
+    } else {
+      console.log('User logged in successfully');
+      res.status(200).json({ message: 'User logged in successfully' });
+    }
+  });
+});
+
+
 // Start the Express server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
